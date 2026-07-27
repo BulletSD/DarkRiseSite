@@ -1,17 +1,17 @@
 <?php
 /**
-* @package   Catalyst
-* @author    YOOtheme http://www.yootheme.com
-* @copyright Copyright (C) YOOtheme GmbH
-* @license   http://www.gnu.org/licenses/gpl.html GNU/GPL
-*/
+ * @package   Catalyst
+ * @author    YOOtheme http://www.yootheme.com
+ * @copyright Copyright (C) YOOtheme GmbH
+ * @license   http://www.gnu.org/licenses/gpl.html GNU/GPL
+ */
 
-// generate css for layout
+// Генерируем CSS для базовой раскладки (ширина страницы)
 $this['config']->set('template_width', '980');
 $css[] = sprintf('body { min-width: %dpx; }', $this['config']->get('template_width'));
-$css[] .= sprintf('.wrapper { width: %dpx; }', $this['config']->get('template_width'));
+$css[] = sprintf('.wrapper { width: %dpx; }', $this['config']->get('template_width'));
 
-// generate css for 3-column-layout
+// Генерируем CSS для трёхколоночной раскладки (контент + два сайдбара)
 $sidebar_a       = '';
 $sidebar_b       = '';
 $maininner_width = intval($this['config']->get('template_width'));
@@ -19,38 +19,40 @@ $sidebar_a_width = intval($this['config']->get('sidebar-a_width'));
 $sidebar_b_width = intval($this['config']->get('sidebar-b_width'));
 $rtl             = $this['config']->get('direction') == 'rtl';
 
-// set widths
+// Считаем ширины колонок в зависимости от того, какие сайдбары включены
 if ($this['modules']->count('sidebar-a')) {
-	$sidebar_a = $this['config']->get('sidebar-a'); 
+	$sidebar_a = $this['config']->get('sidebar-a');
 	$maininner_width -= $sidebar_a_width;
 	$css[] = sprintf('#sidebar-a { width: %dpx; }', $sidebar_a_width);
 }
 
 if ($this['modules']->count('sidebar-b')) {
-	$sidebar_b = $this['config']->get('sidebar-b'); 
+	$sidebar_b = $this['config']->get('sidebar-b');
 	$maininner_width -= $sidebar_b_width;
 	$css[] = sprintf('#sidebar-b { width: %dpx; }', $sidebar_b_width);
 }
 
 $css[] = sprintf('#maininner { width: %dpx; }', $maininner_width);
 
-// all sidebars right
+// Определяем расположение сайдбаров (лево/право) и генерируем нужный CSS
+
+// Оба сайдбара справа
 if (($sidebar_a == 'right' || !$sidebar_a) && ($sidebar_b == 'right' || !$sidebar_b)) {
 	$sidebar_classes = 'sidebar-a-right sidebar-b-right';
 
-// all sidebars left
+// Оба сайдбара слева
 } else if (($sidebar_a == 'left' || !$sidebar_a) && ($sidebar_b == 'left' || !$sidebar_b)) {
 	$sidebar_classes = 'sidebar-a-left sidebar-b-left';
 	$css[] = sprintf('#maininner { float: %s; }', $rtl ? 'left' : 'right');
 
-// sidebar-a left and not sidebar-b 
+// sidebar-a слева, sidebar-b — нет
 } else if ($sidebar_a == 'left') {
 	$sidebar_classes = 'sidebar-a-left sidebar-b-right';
 	$css[] = '#maininner, #sidebar-a { position: relative; }';
 	$css[] = sprintf('#maininner { %s: %dpx; }', $rtl ? 'right' : 'left', $sidebar_a_width);
 	$css[] = sprintf('#sidebar-a { %s: -%dpx; }', $rtl ? 'right' : 'left', $maininner_width);
 
-// sidebar-b left and not sidebar-a
+// sidebar-b слева, sidebar-a — нет
 } else if ($sidebar_b == 'left') {
 	$sidebar_classes = 'sidebar-a-right sidebar-b-left';
 	$css[] = '#maininner, #sidebar-a, #sidebar-b { position: relative; }';
@@ -58,12 +60,12 @@ if (($sidebar_a == 'right' || !$sidebar_a) && ($sidebar_b == 'right' || !$sideba
 	$css[] = sprintf('#sidebar-b { %s: -%dpx; }', $rtl ? 'right' : 'left', $maininner_width + $sidebar_a_width);
 }
 
-// generate css for dropdown menu
+// Генерируем CSS для выпадающего меню (ширина колонок в мега-меню)
 foreach (array(1 => '.dropdown', 2 => '.columns2', 3 => '.columns3', 4 => '.columns4') as $i => $class) {
 	$css[] = sprintf('#menu %s { width: %dpx; }', $class, $i * intval($this['config']->get('menu_width')));
 }
 
-// load css
+// Подключаем CSS-файлы темы по порядку каскада
 $this['asset']->addFile('css', 'css:base.css');
 $this['asset']->addFile('css', 'css:layout.css');
 $this['asset']->addFile('css', 'css:menus.css');
@@ -83,16 +85,17 @@ if (($header = $this['config']->get('header')) && $this['path']->path("css:/head
 if ($this['config']->get('direction') == 'rtl') { $this['asset']->addFile('css', 'css:rtl.css'); }
 $this['asset']->addFile('css', 'css:print.css');
 
-// load fonts
+// Подключаем веб-шрифты (локальные файлы темы + Google Fonts для Yanone Kaffeesatz)
 $http  = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $fonts = array(
-	'orbitron' => 'template:fonts/orbitron.css',
-	'mavenpro' => 'template:fonts/mavenpro.css',
-	'ubuntu' => 'template:fonts/ubuntu.css',
-	'metrophobic' => 'template:fonts/metrophobic.css',
-	'bebas' => 'template:fonts/bebas.css',
-	'droidsans' => 'template:fonts/droidsans.css',
-	'yanonekaffeesatz' => $http.'://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:regular,light');
+	'orbitron'          => 'template:fonts/orbitron.css',
+	'mavenpro'          => 'template:fonts/mavenpro.css',
+	'ubuntu'            => 'template:fonts/ubuntu.css',
+	'metrophobic'       => 'template:fonts/metrophobic.css',
+	'bebas'             => 'template:fonts/bebas.css',
+	'droidsans'         => 'template:fonts/droidsans.css',
+	'yanonekaffeesatz'  => $http.'://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:regular,light',
+);
 
 foreach (array_unique(array($this['config']->get('font1'), $this['config']->get('font2'), $this['config']->get('font3'))) as $font) {
 	if (isset($fonts[$font])) {
@@ -100,7 +103,7 @@ foreach (array_unique(array($this['config']->get('font1'), $this['config']->get(
 	}
 }
 
-// set body css classes
+// Формируем CSS-классы для <body> (расположение сайдбаров, блог/не блог, фон, класс страницы)
 $body_classes  = $sidebar_classes.' ';
 $body_classes .= $this['system']->isBlog() ? 'isblog ' : 'noblog ';
 $body_classes .= 'content-'.$this['config']->get('content_bg').' ';
@@ -108,37 +111,15 @@ $body_classes .= $this['config']->get('page_class');
 
 $this['config']->set('body_classes', $body_classes);
 
-// add social buttons
-$body_config['twitter'] = (int) $this['config']->get('twitter', 0);
-$body_config['plusone'] = (int) $this['config']->get('plusone', 0);
+// Настройки кнопок соцсетей — передаются в data-атрибут body для JS
+$body_config['twitter']  = (int) $this['config']->get('twitter', 0);
+$body_config['plusone']  = (int) $this['config']->get('plusone', 0);
 $body_config['facebook'] = (int) $this['config']->get('facebook', 0);
 
 $this['config']->set('body_config', json_encode($body_config));
 
-// add javascripts
+// Подключаем JS-файлы темы
 $this['asset']->addFile('js', 'js:warp.js');
 $this['asset']->addFile('js', 'js:accordionmenu.js');
 $this['asset']->addFile('js', 'js:dropdownmenu.js');
 $this['asset']->addFile('js', 'js:template.js');
-
-// internet explorer
-if ($this['useragent']->browser() == 'msie') {
-
-	$filters = array('CSSImportResolver', 'CSSRewriteURL', 'CSSCompressor');
-
-	// prepare assets
-	$assets['ie.css']  = $this['asset']->cache('ie.css', $this['asset']->createFile('css:ie.css'), $filters);
-	$assets['ie7.css'] = $this['asset']->cache('ie7.css', $this['asset']->createFile('css:ie7.css'), $filters);
-	$assets['ie8.css'] = $this['asset']->cache('ie8.css', $this['asset']->createFile('css:ie8.css'), $filters);
-
-	// add conditional comments
-	$head[] = sprintf('<!--[if lte IE 8]>%s<script src="%s"></script><![endif]-->', ($url = $assets['ie.css']->getUrl()) ? sprintf('<link rel="stylesheet" href="%s" />', $url) : sprintf('<style>%s</style>', $assets['ie.css']->getContent($this['assetfilter']->create($filters))), $this['path']->url('js:html5.js'));
-	$head[] = sprintf('<!--[if IE 7]>%s<![endif]-->', ($url = $assets['ie7.css']->getUrl()) ? sprintf('<link rel="stylesheet" href="%s" />', $url) : sprintf('<style>%s</style>', $assets['ie7.css']->getContent($this['assetfilter']->create($filters))));
-	$head[] = sprintf('<!--[if IE 8]>%s<![endif]-->', ($url = $assets['ie8.css']->getUrl()) ? sprintf('<link rel="stylesheet" href="%s" />', $url) : sprintf('<style>%s</style>', $assets['ie8.css']->getContent($this['assetfilter']->create($filters))));
-
-}
-
-// add $head
-if (isset($head)) {
-	$this['template']->set('head', implode("\n", $head));
-}
