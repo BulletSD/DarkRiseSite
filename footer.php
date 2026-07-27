@@ -1,16 +1,18 @@
 <?php
 /**
-* @package   Catalyst
-* @author    YOOtheme http://www.yootheme.com
-* @copyright Copyright (C) YOOtheme GmbH
-* @license   http://www.gnu.org/licenses/gpl.html GNU/GPL
-*/
+ * @package   Catalyst
+ * @author    YOOtheme http://www.yootheme.com
+ * @copyright Copyright (C) YOOtheme GmbH
+ * @license   http://www.gnu.org/licenses/gpl.html GNU/GPL
+ */
 
-// get warp
+// Получаем инстанс WARP
 $warp = Warp::getInstance();
 
-// get content from output buffer and set a slot for the template renderer
-$warp['template']->set('content', ob_get_clean());
+// Забираем контент страницы из буфера (открытого в header.php)
+// и передаём его в слот 'content' для рендерера шаблона
+$warp['template']->set( 'content', ob_get_clean() );
 
-// load main template file, located in /layouts/template.php
-echo $warp['template']->render('template');
+// Рендерим главный layout-файл темы (/layouts/template.php),
+// который собирает итоговую разметку страницы: шапку, меню, сайдбары, подвал
+echo $warp['template']->render( 'template' );
